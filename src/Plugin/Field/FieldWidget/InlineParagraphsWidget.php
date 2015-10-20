@@ -11,6 +11,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\WidgetBase;
@@ -212,6 +213,7 @@ class InlineParagraphsWidget extends WidgetBase {
       $target_langcode = $this->getCurrentLangcode($form_state, $items);
       if ($paragraphs_entity->language()->getId() != $target_langcode && !$paragraphs_entity->hasTranslation($target_langcode)) {
         $paragraphs_entity->addTranslation($target_langcode, $paragraphs_entity->toArray());
+        $this->setSourceLangcode($paragraphs_entity, $this->getSourceLangcode($form_state, $items));
       }
 
       // Initiate the paragraph with the correct translation.
@@ -219,6 +221,7 @@ class InlineParagraphsWidget extends WidgetBase {
         $paragraphs_entity = $paragraphs_entity->getTranslation($this->getCurrentLangcode($form_state, $items));
       } else {
         $paragraphs_entity = $paragraphs_entity->addTranslation($this->getCurrentLangcode($form_state, $items));
+        $this->setSourceLangcode($paragraphs_entity, $this->getSourceLangcode($form_state, $items));
       }
 
       $element_parents = $parents;
@@ -856,6 +859,44 @@ class InlineParagraphsWidget extends WidgetBase {
   }
 
   /**
+   * Returns source langcode depending on the form state.
+   *
+   * Returns entity language, if the source language is not available on the
+   * form state.
+   *
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   *
+   * @return string
+   *   The language code.
+   */
+  protected function getSourceLangcode(FormStateInterface $form_state, FieldItemListInterface $items) {
+    $content_translation = $form_state->get('content_translation');
+    if (!empty($content_translation['source'])) {
+      return $content_translation['source']->getId();
+    }
+    return $items->getEntity()->language()->getId();
+  }
+
+  /**
+   * Sets the source language of the current translation if possible.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $paragraphs_entity
+   * @param string $langcode
+   */
+  protected function setSourceLangcode(EntityInterface $paragraphs_entity, $langcode) {
+    try {
+      /** @var \Drupal\content_translation\ContentTranslationManagerInterface $content_translation_manager */
+      $content_translation_manager = \Drupal::service('content_translation.manager');
+      if ($content_translation_manager->isEnabled($paragraphs_entity->getEntityTypeId(), $paragraphs_entity->bundle())) {
+        $content_translation_manager->getTranslationMetadata($paragraphs_entity)
+          ->setSource($langcode);
+      }
+    }
+    catch (\Exception $e) { }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function addMoreAjax(array $form, FormStateInterface $form_state) {
@@ -1096,6 +1137,11 @@ class InlineParagraphsWidget extends WidgetBase {
         $display =  $widget_state['paragraphs'][$item['_original_delta']]['display'];
         $display->extractFormValues($paragraphs_entity, $element[$item['_original_delta']]['subform'], $form_state);
         $display->validateFormValues($paragraphs_entity, $element[$item['_original_delta']]['subform'], $form_state);
+
+        // Set the source language if creating a new entity.
+        if ($paragraphs_entity->isNew()) {
+          $this->setSourceLangcode($paragraphs_entity, $paragraphs_entity->language()->getId());
+        }
 
         $paragraphs_entity->setNewRevision(TRUE);
         $paragraphs_entity->save();
