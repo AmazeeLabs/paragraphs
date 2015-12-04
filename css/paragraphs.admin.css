@@ -86,13 +86,6 @@
   background-color: #fdf8ed;
 }
 
-/*Paragraph toggler*/
-.field--widget-entity-reference-paragraphs .paragraph-toggle {
-  display: inline-block;
-  float: right;
-  text-transform: none;
-}
-
 /*Minimize the paragraphs for easier drag&drop*/
 .field--widget-entity-reference-paragraphs tr.draggable.drag .paragraphs-subform,
 .field--widget-entity-reference-paragraphs tr.draggable.collapsed .paragraphs-subform {
