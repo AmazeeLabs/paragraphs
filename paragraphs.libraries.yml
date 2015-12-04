@@ -12,4 +12,4 @@ drupal.paragraphs.admin:
     theme:
       css/paragraphs.admin.css: {}
   js:
-    js/paragraphs.js: {}
+    js/paragraphs.admin.js: {}
