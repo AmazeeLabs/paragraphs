@@ -11,3 +11,5 @@ drupal.paragraphs.admin:
   css:
     theme:
       css/paragraphs.admin.css: {}
+  js:
+    js/paragraphs.js: {}
