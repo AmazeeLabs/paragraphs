@@ -112,3 +112,9 @@
 .field--widget-entity-reference-paragraphs .field-multiple-table .delta-order {
   vertical-align: top;
 }
+
+/*Warning that paragraph is changed/moved*/
+.field--widget-entity-reference-paragraphs .abbr.tabledrag-changed,
+.field--widget-entity-reference-paragraphs .warning.tabledrag-changed {
+  position: absolute;
+}
