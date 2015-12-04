@@ -13,30 +13,6 @@
        }
      });
 
-     /*Set class to outer paragraph (if there are sub paragraphs present)*/
-     $(paragraph_widget).addClass('sub-paragraph-block');
-     $(paragraph_widget).first().removeClass('sub-paragraph-block').addClass('main-paragraph-block');
-
-     /*Set paragraph titles (Amazee specific)*/
-     $(paragraph_widget + ' tr', context).each(function(e){
-      //  if ( !$(this).parents('.sub-paragraph-block').length ) {
-      //    console.log ( $('.field--name-admin-title input', this).val() );
-      //  }
-       if ( !$('.paragraph-type-title', this).hasClass('added_title')) {
-         value = $('.field--name-admin-title input', this).length ? '<b>' + $('.field--name-admin-title input', this).val() + '</b> (' : '';
-         $('.paragraph-type-title', this).prepend(value);
-         $('.paragraph-type-title', this).append(')');
-         $('.paragraph-type-title', this).addClass('added_title');
-       }
-     });
-
-     /*Check if user changes title and live update it*/
-     $('.field--name-admin-title input', context).each(function(e){
-       $(this).keyup(function() {
-         $(this).closest('tr').find('.paragraph-type-top .paragraph-type-title b').html($(this).val());
-       });
-     });
-
      /*Toggle function*/
      $(paragraph_widget +' .paragraph-toggle', context).each(function(e){
        $(this).click(function(e){
