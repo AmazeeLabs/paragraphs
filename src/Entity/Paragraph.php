@@ -43,7 +43,8 @@ use Drupal\user\UserInterface;
  *     "uuid" = "uuid",
  *     "bundle" = "type",
  *     "langcode" = "langcode",
- *     "revision" = "revision_id"
+ *     "revision" = "revision_id",
+ *     "label" = "admin_title",
  *   },
  *   bundle_entity_type = "paragraphs_type",
  *   field_ui_base_route = "entity.paragraphs_type.edit_form",
@@ -227,6 +228,16 @@ class Paragraph extends ContentEntityBase implements ParagraphInterface {
       ->setDescription(t('The paragraphs type.'))
       ->setSetting('target_type', 'paragraphs_type')
       ->setReadOnly(TRUE);
+
+    $fields['admin_title'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Administration title'))
+      ->setRevisionable(TRUE)
+      ->setSetting('max_length', 255)
+      ->setDisplayOptions('form', array(
+        'type' => 'string_textfield',
+        'weight' => -5,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'))
