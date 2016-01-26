@@ -296,7 +296,13 @@ class InlineParagraphsWidget extends WidgetBase {
           }
 
           // Hide the button when translating.
-          $button_access = $paragraphs_entity->access('delete') && $paragraphs_entity->language()->getId() == $paragraphs_entity->getUntranslated()->language()->getId();
+          //$button_access = $paragraphs_entity->access('delete') && $paragraphs_entity->language()->getId() == $paragraphs_entity->getUntranslated()->language()->getId();
+          // Quick hotfix to be able to see the buttons on all the languages.
+          // We have the issue that for example when having a multilanguage site
+          // and want to create a node with a different language than the site
+          // language, sometimes the buttons are not visible. Until we properly
+          // fix it, we allow the buttons to be visible all the time.
+          $button_access = $paragraphs_entity->access('delete');
           $links['remove_button'] = array(
             '#type' => 'submit',
             '#value' => t('Remove'),
