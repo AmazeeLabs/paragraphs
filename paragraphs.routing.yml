@@ -30,3 +30,11 @@ entity.paragraphs_type.delete_form:
     _title: 'Delete'
   requirements:
     _permission: 'administer paragraphs types'
+
+entity.paragraph.edit_form:
+  path: '/admin/structure/paragraphs_type/{paragraph}'
+  defaults:
+    _entity_form: 'paragraphs_type.edit'
+    _title: 'Edit paragraph type'
+  requirements:
+    _permission: 'administer paragraphs types'

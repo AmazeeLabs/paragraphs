@@ -14,6 +14,7 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\paragraphs\ParagraphInterface;
 use Drupal\user\UserInterface;
+use Drupal\core\Url;
 
 /**
  * Defines the Paragraph entity.
@@ -303,4 +304,20 @@ class Paragraph extends ContentEntityBase implements ParagraphInterface {
     return array(\Drupal::currentUser()->id());
   }
 
+  /**
+   * Gets an array link templates.
+   *
+   * @return array
+   *   An array of link templates containing paths.
+   */
+  public function linkTemplates() {
+    return array('edit-form' => '/admin/structure/paragraphs_type/{paragraph}');
+  }
+
+  /**
+   * Define URL
+   */
+  public function urlInfo($rel = 'canonical', array $options = []) {
+    return parent::urlInfo('edit-form', $options);
+  }
 }
