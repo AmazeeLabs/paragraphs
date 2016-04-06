@@ -747,7 +747,10 @@ class InlineParagraphsWidget extends WidgetBase {
     // Add 'add more' button, if not working with a programmed form.
     if (($real_item_count < $cardinality || $cardinality == FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) && !$form_state->isProgrammed()) {
       // Hide the button when translating.
-      $add_more_access = $this->fieldDefinition->get('translatable') || $this->getCurrentLangcode($form_state, $items) == $items->getEntity()->getUntranslated()->language()->getId();
+      $original_paragraph_language = $items->getEntity()->getUntranslated()->language()->getId();
+      $add_more_access = $this->fieldDefinition->get('translatable')
+        || $original_paragraph_language === Language::LANGCODE_NOT_APPLICABLE
+        || $this->getCurrentLangcode($form_state, $items) == $original_paragraph_language;
       $elements['add_more'] = array(
         '#type' => 'container',
         '#theme_wrappers' => array('paragraphs_dropbutton_wrapper'),
