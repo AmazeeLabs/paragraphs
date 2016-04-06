@@ -16,6 +16,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Language\Language;
 use Drupal\paragraphs;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
@@ -210,7 +211,10 @@ class InlineParagraphsWidget extends WidgetBase {
     if ($paragraphs_entity) {
       // If target translation is not yet available, populate it with data from the original paragraph.
       $target_langcode = $this->getCurrentLangcode($form_state, $items);
-      if ($paragraphs_entity->language()->getId() != $target_langcode && !$paragraphs_entity->hasTranslation($target_langcode)) {
+      if ( $paragraphs_entity->language()->getId() != $target_langcode
+        && $paragraphs_entity->language()->getId() != Language::LANGCODE_NOT_APPLICABLE
+        && !$paragraphs_entity->hasTranslation($target_langcode)
+      ) {
         $translation = $paragraphs_entity->addTranslation($target_langcode, $paragraphs_entity->toArray());
         $translation->content_translation_source = $paragraphs_entity->language()->getId();
       }
