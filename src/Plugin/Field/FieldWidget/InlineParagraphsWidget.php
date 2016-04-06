@@ -218,9 +218,12 @@ class InlineParagraphsWidget extends WidgetBase {
       // Initiate the paragraph with the correct translation.
       if ($paragraphs_entity->hasTranslation($this->getCurrentLangcode($form_state, $items))) {
         $paragraphs_entity = $paragraphs_entity->getTranslation($this->getCurrentLangcode($form_state, $items));
-      } else {
-        $paragraphs_entity = $paragraphs_entity->addTranslation($this->getCurrentLangcode($form_state, $items));
       }
+      // This will never be executed and should have been removed when
+      // https://www.drupal.org/node/2513226 got committed
+//      else {
+//        $paragraphs_entity = $paragraphs_entity->addTranslation($this->getCurrentLangcode($form_state, $items));
+//      }
 
       $element_parents = $parents;
       $element_parents[] = $field_name;
