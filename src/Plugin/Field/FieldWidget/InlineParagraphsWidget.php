@@ -211,7 +211,8 @@ class InlineParagraphsWidget extends WidgetBase {
       // If target translation is not yet available, populate it with data from the original paragraph.
       $target_langcode = $this->getCurrentLangcode($form_state, $items);
       if ($paragraphs_entity->language()->getId() != $target_langcode && !$paragraphs_entity->hasTranslation($target_langcode)) {
-        $paragraphs_entity->addTranslation($target_langcode, $paragraphs_entity->toArray());
+        $translation = $paragraphs_entity->addTranslation($target_langcode, $paragraphs_entity->toArray());
+        $translation->content_translation_source = $paragraphs_entity->language()->getId();
       }
 
       // Initiate the paragraph with the correct translation.
