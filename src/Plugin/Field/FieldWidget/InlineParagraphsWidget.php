@@ -1086,6 +1086,7 @@ class InlineParagraphsWidget extends WidgetBase {
       $display = $widget_state['paragraphs'][$delta]['display'];
 
       if ($widget_state['paragraphs'][$delta]['mode'] != 'remove' && $widget_state['paragraphs'][$delta]['mode'] != 'removed') {
+        // Extract the form values on submit for getting the current paragraph.
         $display->extractFormValues($entity, $element['subform'], $form_state);
         $display->validateFormValues($entity, $element['subform'], $form_state);
       }
@@ -1098,11 +1099,6 @@ class InlineParagraphsWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
-    // Don't do entity saving when we have validation erors.
-    if (count($form_state->getErrors()) || !$form_state->isValidationComplete()) {
-      return $values;
-    }
-
     $field_name = $this->fieldDefinition->getName();
     $widget_state = static::getWidgetState($form['#parents'], $field_name, $form_state);
     $element = NestedArray::getValue($form_state->getCompleteForm(), $widget_state['array_parents']);
@@ -1116,7 +1112,6 @@ class InlineParagraphsWidget extends WidgetBase {
         /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $display */
         $display =  $widget_state['paragraphs'][$item['_original_delta']]['display'];
         $display->extractFormValues($paragraphs_entity, $element[$item['_original_delta']]['subform'], $form_state);
-        $display->validateFormValues($paragraphs_entity, $element[$item['_original_delta']]['subform'], $form_state);
 
         $paragraphs_entity->setNewRevision(TRUE);
         $paragraphs_entity->save();
