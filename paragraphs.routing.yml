@@ -19,7 +19,6 @@ entity.paragraphs_type.edit_form:
   path: '/admin/structure/paragraphs_type/{paragraphs_type}'
   defaults:
     _entity_form: 'paragraphs_type.edit'
-    _title: 'Edit paragraph type'
   requirements:
     _permission: 'administer paragraphs types'
 
@@ -31,10 +30,10 @@ entity.paragraphs_type.delete_form:
   requirements:
     _permission: 'administer paragraphs types'
 
-entity.paragraph.edit_form:
-  path: '/admin/structure/paragraphs_type/{paragraph}'
+paragraphs.prepare_uninstall:
+  path: '/admin/structure/paragraphs_type/uninstall'
   defaults:
-    _entity_form: 'paragraphs_type.edit'
-    _title: 'Edit paragraph type'
+    _form: '\Drupal\paragraphs\Form\PrepareUninstallForm'
+    _title: 'Prepare uninstall'
   requirements:
     _permission: 'administer paragraphs types'
