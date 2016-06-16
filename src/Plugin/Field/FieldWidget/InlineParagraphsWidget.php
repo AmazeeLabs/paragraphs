@@ -324,7 +324,7 @@ class InlineParagraphsWidget extends WidgetBase {
           }
 
           // Hide the button when translating.
-          $button_access = $paragraphs_entity->access('delete') && (!$this->isTranslating || $this->fieldDefinition->get('translatable'));
+          $button_access = $paragraphs_entity->access('delete') && (!$this->isTranslating || $this->fieldDefinition->get('translatable') || !$paragraphs_entity->isTranslatable());
           $links['remove_button'] = array(
             '#type' => 'submit',
             '#value' => t('Remove'),
@@ -787,7 +787,7 @@ class InlineParagraphsWidget extends WidgetBase {
       $elements['add_more'] = array(
         '#type' => 'container',
         '#theme_wrappers' => array('paragraphs_dropbutton_wrapper'),
-        '#access' => $this->fieldDefinition->get('translatable') || !$this->isTranslating,
+        '#access' => !$this->isTranslating || $this->fieldDefinition->get('translatable') || !$host->isTranslatable(),
       );
 
       if (count($access_options)) {
