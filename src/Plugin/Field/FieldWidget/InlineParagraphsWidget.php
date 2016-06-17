@@ -241,7 +241,14 @@ class InlineParagraphsWidget extends WidgetBase {
           $paragraphs_entity = $paragraphs_entity->getTranslation($source_langcode);
           // Initialise the translation with source language values.
           $paragraphs_entity->addTranslation($langcode, $paragraphs_entity->toArray());
+
           $translation = $paragraphs_entity->getTranslation($langcode);
+          // When translating the outer level create new revisions otherwise deleting
+          // translations will delete the field
+//          if (!$paragraphs_entity->isTranslatable() || $this->fieldDefinition->get('translatable')) {
+//            $paragraphs_entity->setNewRevision(TRUE);
+//            $paragraphs_entity->setNeedsSave(TRUE);
+//          }
           $manager = \Drupal::service('content_translation.manager');
           $manager->getTranslationMetadata($translation)->setSource($paragraphs_entity->language()->getId());
         }
@@ -1050,12 +1057,26 @@ class InlineParagraphsWidget extends WidgetBase {
         $new_revision = TRUE;
       }
     }
+    // To make outer-level translation work a new paragraph entity is created for
+    // each translation. Without this deleting a translation will remove paragraphs
+    // completely, not only from the deleted translation
+    $clone_to_new = FALSE;
+    if (
+      $entity instanceof \Drupal\Core\TypedData\TranslatableInterface &&
+      $entity->isNewTranslation() &&
+      $this->fieldDefinition->get('translatable')
+    ) {
+      $clone_to_new = TRUE;
+    }
 
     foreach ($values as $delta => &$item) {
       if (isset($widget_state['paragraphs'][$item['_original_delta']]['entity'])
         && $widget_state['paragraphs'][$item['_original_delta']]['mode'] != 'remove') {
         $paragraphs_entity = $widget_state['paragraphs'][$item['_original_delta']]['entity'];
 
+        if ($clone_to_new) {
+          $paragraphs_entity = $paragraphs_entity->createDuplicate();
+        }
 
         /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $display */
         $display =  $widget_state['paragraphs'][$item['_original_delta']]['display'];
@@ -1076,8 +1097,8 @@ class InlineParagraphsWidget extends WidgetBase {
         }
         $paragraphs_entity->setNeedsSave(TRUE);
         $item['entity'] = $paragraphs_entity;
-        $item['target_id'] = $paragraphs_entity->id();
-        $item['target_revision_id'] = $paragraphs_entity->getRevisionId();
+        $item['target_id'] = $clone_to_new ? null : $paragraphs_entity->id();
+        $item['target_revision_id'] = $clone_to_new ? null : $paragraphs_entity->getRevisionId();
       }
       // If our mode is remove don't save or reference this entity.
       // @todo: Maybe we should actually delete it here?
