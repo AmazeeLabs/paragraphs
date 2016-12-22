@@ -12,6 +12,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\WidgetBase;
@@ -1100,6 +1101,10 @@ class InlineParagraphsWidget extends WidgetBase {
 
     if (isset($widget_state['paragraphs'][$delta]['entity'])) {
       $entity = $widget_state['paragraphs'][$delta]['entity'];
+
+      if ($entity && $entity instanceof EntityChangedInterface) {
+        $entity->setChangedTime(REQUEST_TIME);
+      }
 
       /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $display */
       $display = $widget_state['paragraphs'][$delta]['display'];
