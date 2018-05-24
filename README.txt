@@ -13,3 +13,9 @@ This module module might be considered a clone of field_collection (on which it 
 * Displays per paragraph bundle
 
 Bundles are exportable with features.
+
+Using paragraphs with entity translation
+-----------------------------------------------
+
+ * Paragraph items must be selected as a translatable entity type at
+    Admin -> Config -> Regional -> Entity Translation.

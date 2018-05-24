@@ -56,7 +56,7 @@ class ParagraphsItemEntity extends Entity {
    *
    * @var string
    */
-  protected $langcode = LANGUAGE_NONE;
+  public $langcode = LANGUAGE_NONE;
 
   /**
    * Entity ID.
@@ -512,6 +512,12 @@ class ParagraphsItemEntity extends Entity {
   public function view($view_mode = 'full', $langcode = NULL, $page = NULL) {
     if ($langcode == NULL) {
       $langcode = LANGUAGE_NONE;
+    }
+
+    if (module_exists('entity_translation') && entity_translation_enabled('paragraphs_item', $this->bundle)) {
+      // Force the language code to be the current language in order to display
+      // the correct language version
+      $langcode = $GLOBALS['language_content']->language;
     }
 
     // Iterate over fields in the collection to add URIs for image fields.

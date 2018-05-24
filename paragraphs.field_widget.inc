@@ -356,6 +356,12 @@ function paragraphs_field_widget_form_build(&$form, &$form_state, $field, $insta
   $field_name = $element['#field_name'];
   $language = $element['#language'];
 
+  // Set host entity data since field_attach_form() override the $element values
+  // with the values for the paragraph item.
+  $element['#host_entity_type'] = $element['#entity_type'];
+  $element['#host_entity'] = $element['#entity'];
+  $element['#host_bundle'] = $element['#bundle'];
+
   $bundle = FALSE;
   $id_prefix = implode('-', array_merge($field_parents, array($field_name)));
 
@@ -406,7 +412,7 @@ function paragraphs_field_widget_form_build(&$form, &$form_state, $field, $insta
 
     /* @var $paragraph_item ParagraphsItemEntity */
     $paragraph_item = $field_state['entity'][$delta];
-    $paragraph_item->setHostEntity($field_state['instance']['entity_type'], $element['#entity'], $langcode, FALSE);
+    $paragraph_item->setHostEntity($element['#host_entity_type'], $element['#host_entity'], $langcode, FALSE);
   }
   else {
     if (isset($items[$delta])) {
@@ -425,7 +431,7 @@ function paragraphs_field_widget_form_build(&$form, &$form_state, $field, $insta
 
     if (!empty($paragraph_item)) {
       /* @var $paragraph_item ParagraphsItemEntity */
-      $paragraph_item->setHostEntity($element['#entity_type'], $element['#entity'], $langcode, FALSE);
+      $paragraph_item->setHostEntity($element['#host_entity_type'], $element['#host_entity'], $langcode, FALSE);
 
       if ($force_open) {
         $paragraph_item->being_edited = TRUE;
@@ -456,6 +462,23 @@ function paragraphs_field_widget_form_build(&$form, &$form_state, $field, $insta
         '#type' => 'actions',
         '#weight' => 9999,
       );
+
+      if (module_exists('entity_translation') && entity_translation_enabled('paragraphs_item', $paragraph_item->bundle)) {
+        // Flag the field to be processed in paragraphs_form_alter to.
+        // avoid adding incorrect translation hints.
+        $address = array_slice($element['#parents'], 0, -2);
+        if (empty($form['#paragraphs_translation_fields']) || !in_array($address, $form['#paragraphs_translation_fields'])) {
+          $form['#paragraphs_translation_fields'][] = $address;
+        }
+      }
+
+      // Set the form language to the current language for translation.
+      if (module_exists('entity_translation') && entity_translation_enabled('paragraphs_item', $paragraph_item->bundle)) {
+        $language = entity_language($element['#host_entity_type'], $element['#host_entity']);
+      }
+      else {
+        $language = $GLOBALS['language']->language;
+      }
 
       field_attach_form('paragraphs_item', $paragraph_item, $element, $form_state, $language);
       if ($being_edited_paragraph) {
@@ -504,7 +527,7 @@ function paragraphs_field_widget_form_build(&$form, &$form_state, $field, $insta
           $element['paragraph_bundle_preview'] = array(
             '#type' => 'container',
           );
-          $preview = $paragraph_item->view('paragraphs_editor_preview');
+          $preview = $paragraph_item->view('paragraphs_editor_preview', $langcode);
           $element['paragraph_bundle_preview']['preview'] = $preview;
         }
 
@@ -697,6 +720,16 @@ function paragraphs_field_widget_embed_validate($element, &$form_state, $complet
   $field_state = field_form_get_state($field_parents, $field_name, $language, $form_state);
   if (isset($field_state['entity'][$element['#delta']])) {
     $paragraph_item = $field_state['entity'][$element['#delta']];
+
+    // TODO fix this
+    // Issue: with entity translation enabled, the paragraphs_deleteconfirm_js()
+    // callback fails with an exception due to the missing paragraphs entity property
+    // in the forms array. In the preceeding paragraphs_remove_js() callback
+    // however, the property is present.
+    if ($element['#entity_type'] != 'paragraphs_item') {
+      $element['#entity_type'] = 'paragraphs_item';
+      $element['#entity'] = $paragraph_item;
+    }
 
     // Now validate elements if the entity is not empty.
     if (((!isset($paragraph_item->removed) || !$paragraph_item->removed) && (!isset($paragraph_item->confirmed_removed) || !$paragraph_item->confirmed_removed))) {
