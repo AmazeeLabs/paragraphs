@@ -8,7 +8,7 @@
 namespace Drupal\paragraphs\Plugin\EntityReferenceSelection;
 
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Entity\Plugin\EntityReferenceSelection\SelectionBase;
+use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
 use Drupal\Core\Url;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Component\Utility\NestedArray;
@@ -24,17 +24,17 @@ use Drupal\Component\Utility\NestedArray;
  *   weight = 0
  * )
  */
-class ParagraphSelection extends SelectionBase {
+class ParagraphSelection extends DefaultSelection {
 
   /**
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $entity_manager = \Drupal::entityManager();
+    $entity_type_manager = \Drupal::entityTypeManager();
     $entity_type_id = $this->configuration['target_type'];
     $selection_handler_settings = $this->configuration['handler_settings'] ?: array();
-    $entity_type = $entity_manager->getDefinition($entity_type_id);
-    $bundles = $entity_manager->getBundleInfo($entity_type_id);
+    $entity_type = $entity_type_manager->getDefinition($entity_type_id);
+    $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo($entity_type_id);
 
     // Merge-in default values.
     $selection_handler_settings += array(
@@ -123,11 +123,11 @@ class ParagraphSelection extends SelectionBase {
       $weight++;
     }
 
-    if (!count($bundle_options)) {
-      $form['allowed_bundles_explain'] = array(
+    if (empty($bundle_options)) {
+      $form['allowed_bundles_explain'] = [
         '#type' => 'markup',
-        '#markup' => t('You did not add any paragraph types yet, click !here to add one.', array('!here' => \Drupal::l(t('here'), new Url('paragraphs.type_add', array()))))
-      );
+        '#markup' => t('You did not add any Paragraph types yet, click <a href=":here">here</a> to add one.', [':here' => Url::fromRoute('paragraphs.type_add')->toString()]),
+      ];
     }
 
     return $form;

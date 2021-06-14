@@ -101,7 +101,7 @@ class InlineParagraphsWidget extends WidgetBase {
 
     $elements['form_display_mode'] = array(
       '#type' => 'select',
-      '#options' => \Drupal::entityManager()->getFormModeOptions($this->getFieldSetting('target_type')),
+      '#options' => \Drupal::service('entity_display.repository')->getFormModeOptions($this->getFieldSetting('target_type')),
       '#description' => t('The form display mode to use when rendering the paragraph form.'),
       '#title' => t('Form display mode'),
       '#default_value' => $this->getSetting('form_display_mode'),
@@ -164,7 +164,7 @@ class InlineParagraphsWidget extends WidgetBase {
     $paragraphs_entity = NULL;
     $widget_state = static::getWidgetState($parents, $field_name, $form_state);
 
-    $entity_manager = \Drupal::entityManager();
+    $entity_type_manager = \Drupal::entityTypeManager();
     $target_type = $this->getFieldSetting('target_type');
 
     $item_mode = isset($widget_state['paragraphs'][$delta]['mode']) ? $widget_state['paragraphs'][$delta]['mode'] : 'edit';
@@ -194,10 +194,10 @@ class InlineParagraphsWidget extends WidgetBase {
     }
     elseif (isset($widget_state['selected_bundle'])) {
 
-      $entity_type = $entity_manager->getDefinition($target_type);
+      $entity_type = $entity_type_manager->getDefinition($target_type);
       $bundle_key = $entity_type->getKey('bundle');
 
-      $paragraphs_entity = $entity_manager->getStorage($target_type)->create(array(
+      $paragraphs_entity = $entity_type_manager->getStorage($target_type)->create(array(
         $bundle_key => $widget_state['selected_bundle'],
       ));
 
@@ -250,7 +250,7 @@ class InlineParagraphsWidget extends WidgetBase {
       $element['#prefix'] = '<div id="' . $wrapper_id . '">';
       $element['#suffix'] = '</div>';
 
-      $item_bundles = $entity_manager->getBundleInfo($target_type);
+      $item_bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo($target_type);
       if (isset($item_bundles[$paragraphs_entity->bundle()])) {
         $bundle_info = $item_bundles[$paragraphs_entity->bundle()];
 
@@ -529,7 +529,7 @@ class InlineParagraphsWidget extends WidgetBase {
       }
       elseif ($item_mode == 'preview') {
         $element['subform'] = array();
-        $element['preview'] = entity_view($paragraphs_entity, 'preview', $paragraphs_entity->language()->getId());
+        $element['preview'] = \Drupal::entityTypeManager()->getViewBuilder($entity->getEntityTypeId())->view($paragraphs_entity, 'preview', $paragraphs_entity->language()->getId());
         $element['preview']['#access'] = $paragraphs_entity->access('view');
       }
       elseif ($item_mode == 'closed') {
@@ -565,9 +565,8 @@ class InlineParagraphsWidget extends WidgetBase {
 
     $return_bundles = array();
 
-    $entity_manager = \Drupal::entityManager();
     $target_type = $this->getFieldSetting('target_type');
-    $bundles = $entity_manager->getBundleInfo($target_type);
+    $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo($target_type);
 
 
     // Support for the paragraphs reference type.
@@ -691,10 +690,10 @@ class InlineParagraphsWidget extends WidgetBase {
     $field_state['real_item_count'] = $real_item_count;
     static::setWidgetState($parents, $field_name, $form_state, $field_state);
 
-    $entity_manager = \Drupal::entityManager();
+    $entity_type_manager = \Drupal::entityTypeManager();
     $target_type = $this->getFieldSetting('target_type');
     $bundles = $this->getAllowedTypes();
-    $access_control_handler = $entity_manager->getAccessControlHandler($target_type);
+    $access_control_handler = $entity_type_manager->getAccessControlHandler($target_type);
 
     $options = array();
     $access_options = array();
@@ -1063,8 +1062,8 @@ class InlineParagraphsWidget extends WidgetBase {
    */
   protected function isContentReferenced() {
     $target_type = $this->getFieldSetting('target_type');
-    $target_type_info = \Drupal::entityManager()->getDefinition($target_type);
-    return $target_type_info->isSubclassOf('\Drupal\Core\Entity\ContentEntityInterface');
+    $target_type_info = \Drupal::entityTypeManager()->getDefinition($target_type);
+    return $target_type_info->entityClassImplements('\Drupal\Core\Entity\ContentEntityInterface');
   }
 
   /**
@@ -1079,7 +1078,7 @@ class InlineParagraphsWidget extends WidgetBase {
       $entity = $widget_state['paragraphs'][$delta]['entity'];
 
       if ($entity && $entity instanceof EntityChangedInterface) {
-        $entity->setChangedTime(REQUEST_TIME);
+        $entity->setChangedTime(\Drupal::time()->getRequestTime());
       }
 
       /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $display */

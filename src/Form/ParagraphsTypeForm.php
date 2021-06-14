@@ -52,12 +52,12 @@ class ParagraphsTypeForm extends EntityForm
     $status = $paragraphs_type->save();
 
     if ($status) {
-      drupal_set_message($this->t('Saved the %label Paragraphs type.', array(
+      \Drupal::messenger()->addMessage($this->t('Saved the %label Paragraphs type.', array(
         '%label' => $paragraphs_type->label(),
       )));
     }
     else {
-      drupal_set_message($this->t('The %label Paragraphs type was not saved.', array(
+      \Drupal::messenger()->addMessage($this->t('The %label Paragraphs type was not saved.', array(
         '%label' => $paragraphs_type->label(),
       )));
     }
