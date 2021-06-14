@@ -8,14 +8,14 @@ namespace Drupal\paragraphs\Tests;
 
 use Drupal\Core\Entity\Entity;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\simpletest\WebTestBase;
+use Drupal\Tests\BrowserTestBase;
 
 /**
  * Tests the configuration of paragraphs.
  *
  * @group paragraphs
  */
-class ParagraphsTranslationTest extends WebTestBase {
+class ParagraphsTranslationTest extends BrowserTestBase {
 
   /**
    * Modules to enable.

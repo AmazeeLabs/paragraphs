@@ -6,14 +6,14 @@
 
 namespace Drupal\paragraphs_demo\Tests;
 
-use Drupal\simpletest\WebTestBase;
+use Drupal\Tests\BrowserTestBase;
 
 /**
  * Tests the demo module for Paragraphs.
  *
  * @group paragraphs
  */
-class ParagraphsDemoTest extends WebTestBase {
+class ParagraphsDemoTest extends BrowserTestBase {
 
   /**
    * Modules to enable.

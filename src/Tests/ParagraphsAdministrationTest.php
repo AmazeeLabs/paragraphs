@@ -9,14 +9,15 @@ namespace Drupal\paragraphs\Tests;
 use Drupal\Core\Entity\Entity;
 use Drupal\field_ui\Tests\FieldUiTestTrait;
 use Drupal\paragraphs\Entity\Paragraph;
-use Drupal\simpletest\WebTestBase;
+use Drupal\Tests\BrowserTestBase;
+use Drupal\Core\File\FileSystem;
 
 /**
  * Tests the configuration of paragraphs.
  *
  * @group paragraphs
  */
-class ParagraphsAdministrationTest extends WebTestBase {
+class ParagraphsAdministrationTest extends BrowserTestBase {
 
   use FieldUiTestTrait;
 
@@ -248,9 +249,9 @@ class ParagraphsAdministrationTest extends WebTestBase {
     $edit = array(
       'title[0][value]' => 'Test article',
       'field_paragraphs[0][subform][field_text][0][value]' => 'Test text 1',
-      'files[field_paragraphs_0_subform_field_image_0]' => drupal_realpath('temporary://myImage1.jpg'),
+      'files[field_paragraphs_0_subform_field_image_0]' => FileSystem::realpath('temporary://myImage1.jpg'),
       'field_paragraphs[1][subform][field_text][0][value]' => 'Test text 2',
-      'files[field_paragraphs_1_subform_field_image_0]' => drupal_realpath('temporary://myImage2.jpg'),
+      'files[field_paragraphs_1_subform_field_image_0]' => FileSystem::realpath('temporary://myImage2.jpg'),
     );
     $this->drupalPostForm(NULL, $edit, t('Save and publish'));
 
