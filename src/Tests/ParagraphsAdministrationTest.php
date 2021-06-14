@@ -7,7 +7,7 @@
 namespace Drupal\paragraphs\Tests;
 
 use Drupal\Core\Entity\Entity;
-use Drupal\field_ui\Tests\FieldUiTestTrait;
+use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use Drupal\paragraphs\Entity\Paragraph;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Core\File\FileSystem;
